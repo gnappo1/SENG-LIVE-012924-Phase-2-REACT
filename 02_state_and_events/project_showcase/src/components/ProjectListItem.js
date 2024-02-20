@@ -1,9 +1,15 @@
+import { useState } from "react";
+
+
 const ProjectListItem = ({ id, about, image, link, name, phase }) => {
+  console.log("🚀 ~ ProjectListItem ~ id rerendered:", id)
+  const [clapCount, setClapCount] = useState(0);
+
   return (
     <li className="card">
       <figure className="image">
         <img src={image} alt={name} />
-        <button className="claps">👏{0}</button>
+        <button className="claps" onClick={() => setClapCount(clapCount + 1)}>👏{clapCount}</button>
       </figure>
 
       <section className="details">
