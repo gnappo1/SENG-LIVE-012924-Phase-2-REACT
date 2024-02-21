@@ -1,21 +1,9 @@
 import { useState } from 'react';
 import ProjectListItem from "./ProjectListItem";
 
-const ProjectList = () => {
+const ProjectList = ({ searchQuery, phaseSelected, sortingObj }) => {
   const [projects, setProjects] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("")
-  const [phaseSelected, setPhaseSelected] = useState("All");
 
-  
-  const handlePhaseSelection = (e) => {
-    if (e.target.textContent === "All") {
-      setPhaseSelected("All")
-    } else {
-      const phase = e.target.textContent.slice(-1)
-      setPhaseSelected(Number(phase))
-    }
-  }
-  
   const handleClick = () => {
     loadProjects();
   };
@@ -23,26 +11,53 @@ const ProjectList = () => {
   const loadProjects = () => {
     fetch("http://localhost:4000/projects")
     .then((res) => res.json())
-    .then((projects) => setProjects(projects));
+    .then((projects) => setProjects(projects))
+    .catch(err => console.log(err));
   }
-  
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-  }
-  
-  const filteredProjects = projects.filter(project => {
-    return phaseSelected === "All" || project.phase === phaseSelected
+
+  const finalProjects = projects.filter(project => {
+    return (phaseSelected === "All" || project.phase === phaseSelected) && (searchQuery === "" || project.name.toLowerCase().includes(searchQuery.toLowerCase()))
   })
 
-  const searchResults = filteredProjects.filter(project => {
-    return searchQuery === "" || project.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const sortedProjects = [...finalProjects].sort((a, b) => {
+    if (sortingObj.sortBy === 'name') {
+      if (sortingObj.sortHow === "asc") {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+    
+        // names must be equal
+        return 0;
+
+      } else {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase();
+        if (nameA > nameB) {
+          return -1;
+        }
+        if (nameA < nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      }
+    } else if(sortingObj.sortBy === 'phase') {
+        return 0
+    }
+      return 0
   })
   
   const renderProjects = () => {
-    return searchResults.map(project => (
+    return sortedProjects.map(project => (
       <ProjectListItem
-      key={project.id}
-      {...project}
+        key={project.id}
+        {...project}
       />
       ))
   }
@@ -52,21 +67,7 @@ const ProjectList = () => {
       <button onClick={handleClick}>Load Projects</button>
       <h2>Projects</h2>
 
-      <div className="filter" onClick={handlePhaseSelection}>
-        <button>All</button>
-        <button>Phase 5</button>
-        <button>Phase 4</button>
-        <button>Phase 3</button>
-        <button>Phase 2</button>
-        <button>Phase 1</button>
-      </div>
-      <input
-        type="text"
-        placeholder="Search..."
-        onChange={handleSearch}
-      />
-
-      <ul className="cards">{renderProjects(searchResults)}</ul>
+      <ul className="cards">{renderProjects(finalProjects)}</ul>
     </section>
   );
 };
