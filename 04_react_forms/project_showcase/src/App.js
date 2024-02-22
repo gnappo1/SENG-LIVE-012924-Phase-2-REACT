@@ -58,7 +58,7 @@ const App = () => {
 
   return (
     <div className={isDarkMode ? "App" : "App light"}>
-      {error ? <p className="error-message red">{error}</p> : null}
+      {error ? <p className="error-message red center bold">{error}</p> : null}
       <Header isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
       <ProjectForm addProject={addProject} removeLastProject={removeLastProject } />
       <button className="load-btn" onClick={loadProjects}>Load Projects</button>
