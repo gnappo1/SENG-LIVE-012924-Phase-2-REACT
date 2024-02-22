@@ -169,6 +169,9 @@ select:focus {
   margin-left: 42.5%;
 }
 
+.red {
+  background-color: red;
+}
 /* Filter */
 .filter {
   display: flex;
