@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { object, string, number } from 'yup';
+import { object, string } from 'yup';
 
 
 const initialState = {
@@ -42,7 +42,6 @@ const ProjectForm = ({ addProject, removeLastProject }) => {
     // }
 
     //! Validate with yup
-    debugger
     projectSchema.validate(formData)
       .then(validFormData => {
         addProject(validFormData)
