@@ -1,6 +1,6 @@
 import ProjectListItem from "./ProjectListItem";
 
-const ProjectList = ({ projects, searchQuery, phaseSelected, handleDeleteProject }) => {
+const ProjectList = ({ projects, searchQuery, phaseSelected, handleDeleteProject, handleChangeEditingMode }) => {
 
     const renderProjects = () => {
       return finalProjects.map(project => (
@@ -8,6 +8,7 @@ const ProjectList = ({ projects, searchQuery, phaseSelected, handleDeleteProject
         key={project.id}
         {...project}
           handleDeleteProject={handleDeleteProject}
+          handleChangeEditingMode={handleChangeEditingMode}
         />
         ))
       }

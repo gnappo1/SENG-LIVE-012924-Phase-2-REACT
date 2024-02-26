@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { object, string } from 'yup';
 
 
@@ -19,10 +19,25 @@ const projectSchema = object().shape({
   link: string().required('Link is required!'),
   image: string().required('Image is required!')
 })
+const URL = 'http://localhost:4000/projects'
 
-const ProjectForm = ({ handleAddProject, removeLastProject }) => {
+const ProjectForm = ({ handleAddProject, removeLastProject, idEditingMode, handleEditProject, handleChangeEditingMode, handleUnswapProject }) => {
   const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState("");
+  const [originalVersionOfProject, setOriginalVersionOfProject] = useState(initialState);
+
+  useEffect(() => {
+    if (idEditingMode) {
+      fetch(`${URL}/${idEditingMode}`)
+      .then(resp => resp.json())
+        .then(data => {
+          setOriginalVersionOfProject(data)
+          setFormData(data)
+        })
+      .catch(err => alert(err))
+    }
+
+  }, [idEditingMode]);
 
   const handleChange = (e) => {
     setFormData({
@@ -42,17 +57,41 @@ const ProjectForm = ({ handleAddProject, removeLastProject }) => {
     // }
 
     //! Validate with yup
-    projectSchema.validate(formData)
+    // const finalSchemaToUse = idEditingMode ? editSchemaValidation : createProjectSchema
+      projectSchema.validate(formData)
       .then(validFormData => {
-        handleAddProject(validFormData)
-        //! We need to talk to the server
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(formData)
-        })
+        if (idEditingMode) {
+          //! Optimistic UI update first
+          handleEditProject(validFormData)
+          fetch(`${URL}/${idEditingMode}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+          })
+            .then(resp => {
+              if (!resp.ok) {
+                throw new Error("Failed to fetch because server is not running")
+              }
+              handleChangeEditingMode(0)
+              setFormData(initialState)
+            })
+            .catch(err => {
+              setError(err.text)
+              setTimeout(() => setError(""), 5000)
+              
+              handleUnswapProject(originalVersionOfProject)
+            })
+        } else {
+          handleAddProject(validFormData)
+          fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+          })
           .then(resp => {
             if (!resp.ok) {
               throw new Error("Failed to fetch because server is not running")
@@ -64,8 +103,10 @@ const ProjectForm = ({ handleAddProject, removeLastProject }) => {
             setTimeout(() => setError(""), 5000)
             removeLastProject()
           })
+        }
       })
       .catch(validationError => setError(validationError.message))
+        //! We need to talk to the server
     //! Optimistic rendering
     //! Put the new project onto the page
 
@@ -75,7 +116,7 @@ const ProjectForm = ({ handleAddProject, removeLastProject }) => {
     <section>
       {error ? <p className="error-message red">{error}</p> : null}
       <form className="form" autoComplete="off" onChange={handleChange} onSubmit={handleSubmit}>
-        <h3>Add New Project</h3>
+        <h3>{idEditingMode ? "Update Existing" : "Add New"} Project</h3>
 
         <label htmlFor="name">Name</label>
         <input type="text" id="name" name="name" value={formData.name} />
@@ -99,7 +140,7 @@ const ProjectForm = ({ handleAddProject, removeLastProject }) => {
         <label htmlFor="image">Screenshot</label>
         <input type="text" id="image" name="image" value={formData.image} />
 
-        <button type="submit">Add Project</button>
+        <button type="submit">{idEditingMode ? "Update" : "Add"} Project</button>
       </form>
     </section>
   );

@@ -13,6 +13,7 @@ const App = () => {
   const [projects, setProjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseSelected, setPhaseSelected] = useState("All");
+  const [idEditingMode, setIdEditingMode] = useState(0);
   
   useEffect(() => {
     (async () => {
@@ -33,6 +34,14 @@ const App = () => {
       const phase = e.target.textContent.slice(-1)
       setPhaseSelected(Number(phase))
     }
+  }
+
+  const handleChangeEditingMode = (value) => {
+    setIdEditingMode(value)
+  }
+
+  const handleUnswapProject = (originalProjectObj) => {
+    setProjects(mostCurrentProjects => mostCurrentProjects.map(project => project.id === originalProjectObj.id ? originalProjectObj : project))
   }
 
   const handleSearch = (e) => {
@@ -66,16 +75,20 @@ const App = () => {
 
   }
 
+  const handleEditProject = (projectToUpdate) => {
+    setProjects(mostCurrentProjects => mostCurrentProjects.map(project => project.id === projectToUpdate.id ? projectToUpdate : project))
+  }
+
   const toggleDarkMode = () => setIsDarkMode(current => !current)
 
 
   return (
     <div className={isDarkMode ? "App" : "App light"}>
       <Header isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-      <ProjectForm handleAddProject={handleAddProject} />
+      <ProjectForm handleAddProject={handleAddProject} idEditingMode={idEditingMode} handleEditProject={handleEditProject} handleChangeEditingMode={handleChangeEditingMode} handleUnswapProject={handleUnswapProject }/>
       <ButtonsFilter handlePhaseSelection={handlePhaseSelection}/>
       <SearchBar handleSearch={handleSearch} searchQuery={searchQuery} />
-      <ProjectList projects={projects} searchQuery={searchQuery} phaseSelected={phaseSelected} handleDeleteProject={handleDeleteProject}/>
+      <ProjectList projects={projects} searchQuery={searchQuery} phaseSelected={phaseSelected} handleDeleteProject={handleDeleteProject} handleChangeEditingMode={handleChangeEditingMode }/>
 
     </div>
   );
