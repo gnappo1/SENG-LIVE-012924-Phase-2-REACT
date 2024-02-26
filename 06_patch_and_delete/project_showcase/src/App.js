@@ -6,6 +6,8 @@ import SearchBar from "./components/search/SearchBar";
 import ButtonsFilter from "./components/search/ButtonsFilter";
 import { v4 as uuidv4 } from "uuid"
 
+const URL = 'http://localhost:4000/projects'
+
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [projects, setProjects] = useState([]);
@@ -45,6 +47,25 @@ const App = () => {
     })
   }
 
+  const handleDeleteProject = (idOfElementToRemove) => {
+    const projectToRemove = projects.find(project => project.id === idOfElementToRemove)
+    //! Optimistic update:
+    //! Update the UI
+    setProjects(currentProjectList => currentProjectList.filter(project => project.id !== idOfElementToRemove))
+    //! Update the server
+    fetch(`${URL}/${idOfElementToRemove}`, {method: "DELETE"})
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error('something went wrong when updating the server!')
+      }
+    })
+    .catch(err => {
+      alert(err)
+      setProjects(currentProjects => [...currentProjects, projectToRemove])
+    })
+
+  }
+
   const toggleDarkMode = () => setIsDarkMode(current => !current)
 
 
@@ -54,7 +75,7 @@ const App = () => {
       <ProjectForm handleAddProject={handleAddProject} />
       <ButtonsFilter handlePhaseSelection={handlePhaseSelection}/>
       <SearchBar handleSearch={handleSearch} searchQuery={searchQuery} />
-      <ProjectList projects={projects} searchQuery={searchQuery} phaseSelected={phaseSelected}  />
+      <ProjectList projects={projects} searchQuery={searchQuery} phaseSelected={phaseSelected} handleDeleteProject={handleDeleteProject}/>
 
     </div>
   );

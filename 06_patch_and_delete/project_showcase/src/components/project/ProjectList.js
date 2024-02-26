@@ -1,12 +1,13 @@
 import ProjectListItem from "./ProjectListItem";
 
-const ProjectList = ({projects, searchQuery, phaseSelected}) => {
+const ProjectList = ({ projects, searchQuery, phaseSelected, handleDeleteProject }) => {
 
     const renderProjects = () => {
       return finalProjects.map(project => (
         <ProjectListItem
         key={project.id}
         {...project}
+          handleDeleteProject={handleDeleteProject}
         />
         ))
       }

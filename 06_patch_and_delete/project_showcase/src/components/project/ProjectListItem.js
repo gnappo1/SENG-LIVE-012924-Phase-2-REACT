@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaPencilAlt, FaTrash } from "react-icons/fa"
 
-const ProjectListItem = ({ id, image, name, link, about, phase }) => {
+const ProjectListItem = ({ id, image, name, link, about, phase, handleDeleteProject }) => {
   // const {image, name, link, about, phase} = project
   const [clapCount, setClapCount] = useState(0);
 
@@ -30,7 +30,7 @@ const ProjectListItem = ({ id, image, name, link, about, phase }) => {
         <span className="badge blue">Phase {phase}</span>
         <div className="manage">
           <button onClick={() => /* do something */ null}><FaPencilAlt /></button>
-          <button onClick={() => /* do something */ null}><FaTrash /></button>
+          <button onClick={() => handleDeleteProject(id)}><FaTrash /></button>
         </div>
       </footer>
     </li>
