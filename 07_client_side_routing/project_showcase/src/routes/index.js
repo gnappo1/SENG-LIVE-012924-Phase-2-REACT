@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
-import App from '../App'
+import App, { projectsLoader } from '../App'
 import ProjectContainer from '../components/project/ProjectContainer'
 import ProjectForm from '../components/project/ProjectForm'
 import ProjectDetails from '../components/project/ProductDetails'
@@ -10,6 +10,7 @@ export const router = createBrowserRouter([
         path: "/",
         element: <App />,
         errorElement: <Error />,
+        loader: projectsLoader,
         children: [
             {
                 path: "projects",

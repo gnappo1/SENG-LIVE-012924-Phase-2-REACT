@@ -1,30 +1,18 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Header from "./components/navigation/Header";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLoaderData } from "react-router-dom";
 import Notification from "./components/navigation/Notification";
 
 const App = () => {
+  const data = useLoaderData()
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [error, setError] = useState("");
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(data);
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseSelected, setPhaseSelected] = useState("All");
   const [editModeProjectId, setEditModeProjectId] = useState(null);
   const navigate = useNavigate()
-  
   const updateError = (err) => setError(err)
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(`http://localhost:4000/projects`)
-        const data = await response.json()
-        setProjects(data);
-      } catch (error) {
-        alert(error)
-      }
-    })()
-  }, [])
   
   const handlePhaseSelection = (e) => {
     if (e.target.textContent === "All") {
@@ -75,3 +63,12 @@ const App = () => {
 };
 
 export default App;
+
+export const projectsLoader = async () => {
+  try {
+    const response = await fetch(`http://localhost:4000/projects`)
+    return await response.json()
+  } catch (error) {
+    return error
+  }
+}
