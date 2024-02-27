@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Great Outdoors Guide",
       "about": "Plan your next adventure to in the U.S. National Parks!",
-      "phase": 4,
+      "phase": "4",
       "link": "https://great-outdoors-guide.netlify.app",
       "image": "https://i.imgur.com/8GnP2Uw.png"
     },
@@ -71,22 +71,6 @@
       "phase": 3,
       "link": "https://homestory.netlify.app",
       "image": "https://i.imgur.com/il8ft21.png"
-    },
-    {
-      "id": "24",
-      "name": "Locksley To Do",
-      "about": "A todo list and calendar app",
-      "phase": 4,
-      "link": "https://www.locksleyr.com",
-      "image": "https://i.imgur.com/XOnaclL.png"
-    },
-    {
-      "id": "25",
-      "name": "GamesRx",
-      "about": "Game info and reviews",
-      "phase": 4,
-      "link": "https://gamesrx.netlify.app",
-      "image": "https://i.imgur.com/Japzh6v.png"
     }
   ]
 }

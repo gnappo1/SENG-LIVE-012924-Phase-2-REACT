@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import {object, string, number, date} from "yup"
-
+import {object, string} from "yup"
+import { useOutletContext, useNavigate, useParams } from "react-router-dom";
 const initialState = {
   name: "",
   about: "",
@@ -11,18 +11,24 @@ const initialState = {
 
 const URL = "http://localhost:4000/projects"
 
-const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, setEditingModeId}) => {
+const ProjectForm = () => {
 
   const [formData, setFormData] = useState(initialState)
+  const { handleAddProject, updateError, handlePatchProject, setEditingModeId } = useOutletContext()
+  const navigate = useNavigate()
+  const { projectId } = useParams()
 
   useEffect(() => {
-    if (editModeProjectId) {
-      fetch(`http://localhost:4000/projects/${editModeProjectId}`)
+    if (projectId) {
+      fetch(`http://localhost:4000/projects/${projectId}`)
       .then(resp => resp.json())
       .then(setFormData)
-      .catch(err => alert(err))
+      .catch(err => {
+        updateError(err.message)
+        navigate("/projects")
+      })
     }
-  }, [editModeProjectId]);
+  }, [projectId, updateError, navigate]);
 
   const projectSchema = object({
     name: string().required("Name is required!"),
@@ -49,8 +55,8 @@ const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, s
     .validate(formData)
     .then(validFormData => {
       // if (editModeProjectId) {
-        const url = `${URL}/${editModeProjectId || ""}`
-        const method = editModeProjectId ? "PATCH" : "POST"
+      const url = `${URL}/${projectId || ""}`
+      const method = projectId ? "PATCH" : "POST"
         fetch(url, {
           method,
           headers: {
@@ -60,7 +66,7 @@ const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, s
         })
         .then(resp => resp.json())
         .then(projectFromDb => {
-          if (editModeProjectId) {
+          if (projectId) {
             //! 4. Fire a PATCH fetch call that on success will call a helper function that would send the updated obj to our collection
               handlePatchProject(projectFromDb) 
               //! 5. Reset back to POST creation mode
@@ -69,25 +75,10 @@ const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, s
             handleAddProject(projectFromDb)
           } 
           //! 6. Reset the form IN CASE OF A SUCCESS
-          setFormData(initialState)
+          // setFormData(initialState)
         })
+        .then(() => navigate("/projects"))
         .catch(err => alert(err))
-      // } else {
-      //   fetch("http://localhost:4000/projects", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json" 
-      //     },
-      //     body: JSON.stringify(validFormData)
-      //   })
-      //   .then(resp => resp.json())
-      //   .then(createdProject => {
-      //     //! 4. Fire a POST fetch call that on success will call a helper function that would send the new obj to our collection
-      //     handleAddProject(createdProject)
-      //     //! 5. Reset the form IN CASE OF A SUCCESS
-      //     setFormData(initialState)
-      //   })
-      //   .catch(err => alert(err))
     })
     .catch(validationError => {
       alert(validationError.message)
@@ -97,7 +88,7 @@ const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, s
   return (
     <section>
       <form className="form" autoComplete="off" onSubmit={handleSubmit}>
-        <h3>{editModeProjectId ? "Update Project" : "Add New Project"}</h3>
+        <h3>{projectId ? "Update Project" : "Add New Project"}</h3>
 
         <label htmlFor="name">Name</label>
         <input type="text" id="name" name="name" value={formData.name} onChange={handleChange}/>
@@ -121,7 +112,7 @@ const ProjectForm = ({handleAddProject, editModeProjectId, handlePatchProject, s
         <label htmlFor="image">Screenshot</label>
         <input type="text" id="image" name="image"  value={formData.image} onChange={handleChange}/>
 
-        <button type="submit">{editModeProjectId ? "Update" : "Create"}</button>
+        <button type="submit">{projectId ? "Update" : "Create"}</button>
       </form>
     </section>
   );

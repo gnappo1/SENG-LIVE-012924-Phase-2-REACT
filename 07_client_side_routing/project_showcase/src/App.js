@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react"
 import Header from "./components/navigation/Header";
-import ProjectForm from "./components/project/ProjectForm";
-import ProjectList from "./components/project/ProjectList";
-import SearchBar from "./components/search/SearchBar";
-import ButtonsFilter from "./components/search/ButtonsFilter";
+import { Outlet, useNavigate } from "react-router-dom";
+import Notification from "./components/navigation/Notification";
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [error, setError] = useState("");
   const [projects, setProjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseSelected, setPhaseSelected] = useState("All");
   const [editModeProjectId, setEditModeProjectId] = useState(null);
+  const navigate = useNavigate()
   
+  const updateError = (err) => setError(err)
+
   useEffect(() => {
     (async () => {
       try {
@@ -52,7 +54,9 @@ const App = () => {
     fetch(`http://localhost:4000/projects/${projectId}`, {method: "DELETE"})
     .then(() => {
       setProjects(currentProjects => currentProjects.filter(project => project.id !== projectId))
+      navigate("/projects")
     })
+    // .then(() => navigate("/projects"))
   }
 
   const toggleDarkMode = () => setIsDarkMode(current => !current)
@@ -63,12 +67,9 @@ const App = () => {
 
   return (
     <div className={isDarkMode ? "App" : "App light"}>
+      <Notification error={error} updateError={updateError}/>
       <Header isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-      <ProjectForm handleAddProject={handleAddProject} editModeProjectId={editModeProjectId} handlePatchProject={handlePatchProject} setEditingModeId={setEditingModeId} />
-      <ButtonsFilter handlePhaseSelection={handlePhaseSelection}/>
-      <SearchBar handleSearch={handleSearch} searchQuery={searchQuery} />
-      <ProjectList projects={projects} searchQuery={searchQuery} phaseSelected={phaseSelected} setEditingModeId={setEditingModeId} handleDelete={handleDelete} />
-
+      <Outlet context={{ updateError, handlePhaseSelection, handleSearch, handleAddProject, handlePatchProject, editModeProjectId, projects, searchQuery, phaseSelected, setEditingModeId, handleDelete }}/>
     </div>
   );
 };
