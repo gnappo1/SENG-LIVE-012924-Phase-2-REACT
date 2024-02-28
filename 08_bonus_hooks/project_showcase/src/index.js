@@ -3,13 +3,14 @@ import { router } from "./routes";
 
 import "./index.css"
 import { RouterProvider } from "react-router-dom";
+import ProjectsProvider from "./context/ProjectsProvider";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
 
 console.log("🚀 ~ router:", router)
 root.render(
-  // <StrictMode>
+  <ProjectsProvider>
     <RouterProvider router={router} />
-  // </StrictMode>
+  </ProjectsProvider>
 );

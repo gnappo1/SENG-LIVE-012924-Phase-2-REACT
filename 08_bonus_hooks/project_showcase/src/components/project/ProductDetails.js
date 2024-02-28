@@ -1,6 +1,8 @@
+import { useContext } from "react";
 import { useState, useEffect } from "react";
 import { FaPencilAlt, FaTrash } from "react-icons/fa"
-import { useOutletContext, useParams, useNavigate } from "react-router-dom";
+import { useOutletContext, useParams, useNavigate, useLocation } from "react-router-dom";
+import { ProjectsContext } from "../../context/ProjectsProvider";
 const url = 'http://localhost:4000/projects/'
 
 const ProjectDetails = () => {
@@ -9,7 +11,9 @@ const ProjectDetails = () => {
     const [projectDetails, setProjectDetails] = useState(null);
     const { projectId } = useParams()
     const navigate = useNavigate()
-    const { setEditingModeId, handleDelete, updateError } = useOutletContext()
+    const { pathname } = useLocation()
+    const { handleDelete, handleAddProject } = useContext(ProjectsContext)
+    const { setEditingModeId, updateError } = useOutletContext()
 
     useEffect(() => {
         fetch(url + projectId)
@@ -44,16 +48,23 @@ const ProjectDetails = () => {
                 ) : null}
             </section>
 
-            <footer className="extra">
+            {pathname === "/projects" ? null : <footer className="extra">
                 <span className="badge blue">Phase {phase}</span>
                 <div className="manage">
                     <button onClick={() => {
                         setEditingModeId(id)
                         navigate(`/projects/${id}/edit`)
                     }}><FaPencilAlt /></button>
-                    <button onClick={() => handleDelete(id)}><FaTrash /></button>
+                    <button onClick={() => {
+                        handleDelete(projectDetails)
+                        .then(() => navigate("/projects"))
+                        .catch((err) => {
+                            alert(err)
+                            handleAddProject(projectDetails)
+                        })
+                    }}><FaTrash /></button>
                 </div>
-            </footer>
+            </footer>}
         </li>
     );
 }

@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import ButtonsFilter from '../search/ButtonsFilter'
 import SearchBar from '../search/SearchBar'
 import ProjectList from './ProjectList'
+import { ProjectsContext } from '../../context/ProjectsProvider'
 import { useOutletContext } from 'react-router-dom'
 
 const ProjectContainer = () => {
-    const { handlePhaseSelection, handleSearch, projects, searchQuery, phaseSelected, setEditingModeId, handleDelete } = useOutletContext()
+    const {projects, handleDelete} = useContext(ProjectsContext)
+    const { handlePhaseSelection, handleSearch, searchQuery, phaseSelected, setEditingModeId } = useOutletContext()
   return (
     <div>
         <ButtonsFilter handlePhaseSelection={handlePhaseSelection} />

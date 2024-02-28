@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import {object, string} from "yup"
 import { useOutletContext, useNavigate, useParams } from "react-router-dom";
+import { ProjectsContext } from '../../context/ProjectsProvider'
+
 const initialState = {
   name: "",
   about: "",
@@ -14,15 +16,20 @@ const URL = "http://localhost:4000/projects"
 const ProjectForm = () => {
 
   const [formData, setFormData] = useState(initialState)
-  const { handleAddProject, updateError, handlePatchProject, setEditingModeId } = useOutletContext()
+  const { handleAddProject, handlePatchProject } = useContext(ProjectsContext)
+  const {updateError, setEditingModeId } = useOutletContext()
   const navigate = useNavigate()
+  const initialVersionOfProject = useRef({})
   const { projectId } = useParams()
 
   useEffect(() => {
     if (projectId) {
       fetch(`http://localhost:4000/projects/${projectId}`)
       .then(resp => resp.json())
-      .then(setFormData)
+      .then(data => {
+        initialVersionOfProject.current = data
+        setFormData(data)
+      })
       .catch(err => {
         updateError(err.message)
         navigate("/projects")

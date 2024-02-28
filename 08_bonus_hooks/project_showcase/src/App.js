@@ -1,17 +1,16 @@
 import { useState, useCallback } from "react"
 import Header from "./components/navigation/Header";
-import { Outlet, useNavigate, useLoaderData } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Notification from "./components/navigation/Notification";
 
 const App = () => {
-  const data = useLoaderData()
+  // const data = useLoaderData()
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [error, setError] = useState("");
-  const [projects, setProjects] = useState(data);
+  // const [projects, setProjects] = useState(data);
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseSelected, setPhaseSelected] = useState("All");
   const [editModeProjectId, setEditModeProjectId] = useState(null);
-  const navigate = useNavigate()
   const updateError = (err) => setError(err)
   
   const handlePhaseSelection = (e) => {
@@ -27,26 +26,6 @@ const App = () => {
       setSearchQuery(e.target.value)
   }
 
-  const handleAddProject = (createdProject) => {
-    setProjects(currentProjectList => [createdProject, ...currentProjectList]) //! new state derived based on current state
-    // setProjects([createdProject, ...projects])
-  }
-
-  const handlePatchProject = (updatedProject) => {
-    setProjects(currentProjects => currentProjects.map(project => (
-      project.id === updatedProject.id ? updatedProject : project
-    )))
-  }
-
-  const handleDelete = useCallback((projectId) => {
-    fetch(`http://localhost:4000/projects/${projectId}`, {method: "DELETE"})
-    .then(() => {
-      setProjects(currentProjects => currentProjects.filter(project => project.id !== projectId))
-      navigate("/projects")
-    })
-    // .then(() => navigate("/projects"))
-  }, [navigate])
-
   const toggleDarkMode = () => setIsDarkMode(current => !current)
 
   const setEditingModeId = useCallback((projectId) => {
@@ -57,7 +36,7 @@ const App = () => {
     <div className={isDarkMode ? "App" : "App light"}>
       <Notification error={error} updateError={updateError}/>
       <Header isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-      <Outlet context={{ updateError, handlePhaseSelection, handleSearch, handleAddProject, handlePatchProject, editModeProjectId, projects, searchQuery, phaseSelected, setEditingModeId, handleDelete }}/>
+      <Outlet context={{ updateError, handlePhaseSelection, handleSearch, editModeProjectId, searchQuery, phaseSelected, setEditingModeId }}/>
     </div>
   );
 };
