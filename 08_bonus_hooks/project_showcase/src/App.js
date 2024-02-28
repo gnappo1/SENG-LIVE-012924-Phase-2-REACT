@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import Header from "./components/navigation/Header";
 import { Outlet, useNavigate, useLoaderData } from "react-router-dom";
 import Notification from "./components/navigation/Notification";
@@ -38,20 +38,20 @@ const App = () => {
     )))
   }
 
-  const handleDelete = (projectId) => {
+  const handleDelete = useCallback((projectId) => {
     fetch(`http://localhost:4000/projects/${projectId}`, {method: "DELETE"})
     .then(() => {
       setProjects(currentProjects => currentProjects.filter(project => project.id !== projectId))
       navigate("/projects")
     })
     // .then(() => navigate("/projects"))
-  }
+  }, [navigate])
 
   const toggleDarkMode = () => setIsDarkMode(current => !current)
 
-  const setEditingModeId = (projectId) => {
+  const setEditingModeId = useCallback((projectId) => {
       setEditModeProjectId(projectId)
-  }
+  }, [])
 
   return (
     <div className={isDarkMode ? "App" : "App light"}>
